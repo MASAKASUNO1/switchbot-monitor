@@ -1,5 +1,6 @@
 const axios = require('axios');
-const crypto = require('crypto-js');
+const crypto = require('crypto');
+const { v4: uuidv4 } = require('uuid');
 
 class SwitchBotAPI {
   constructor(token, secret) {
@@ -10,9 +11,11 @@ class SwitchBotAPI {
 
   generateSignature() {
     const timestamp = Date.now().toString();
-    const nonce = crypto.lib.WordArray.random(16).toString();
+    const nonce = uuidv4();
     const stringToSign = this.token + timestamp + nonce;
-    const signature = crypto.HmacSHA256(stringToSign, this.secret).toString().toUpperCase();
+    const signature = crypto.createHmac('sha256', this.secret)
+                           .update(stringToSign)
+                           .digest('base64');
 
     return {
       signature,
