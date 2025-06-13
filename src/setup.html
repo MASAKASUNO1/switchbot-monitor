@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwitchBot API Setup</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 30px;
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .info-box {
+            background-color: #e8f4fd;
+            border: 1px solid #bee5eb;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 13px;
+            color: #0c5460;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #007aff;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+        
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        button {
+            background-color: #007aff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 SwitchBot API Setup</h1>
+        <p class="subtitle">メニューバーアプリを使用するためにAPI認証情報を設定してください</p>
+        
+        <div class="info-box">
+            <strong>📱 API認証情報の取得方法:</strong><br>
+            1. SwitchBotアプリを開く<br>
+            2. 右下の「Profile」をタップ<br>
+            3. 「設定」をタップ<br>
+            4. 「アプリバージョン」を10回タップ<br>
+            5. 「開発者向けオプション」が表示される<br>
+            6. 「トークンを取得」をタップ
+        </div>
+        
+        <form>
+            <div class="form-group">
+                <label for="token">API Token:</label>
+                <input type="text" id="token" placeholder="APIトークンを入力してください" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="secret">Secret Key:</label>
+                <input type="password" id="secret" placeholder="シークレットキーを入力してください" required>
+            </div>
+            
+            <div class="button-group">
+                <button type="button" id="saveButton">💾 保存して開始</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
