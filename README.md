@@ -1,64 +1,117 @@
-# SwitchBot Monitor - Electron Version
+# SwitchBot Monitor
 
-SwitchBotの状態をmacOSメニューバーで監視するElectronアプリです。
+<p align="center">
+  <img src="assets/icon.png" alt="SwitchBot Monitor" width="64" height="64">
+</p>
 
-## 機能
+<p align="center">
+  <strong>SwitchBot devices monitoring on your macOS menubar</strong>
+</p>
 
-- 🌡️ メニューバーに温度と湿度を表示
-- 📱 右クリックでデバイス一覧と詳細情報を表示
-- 🔄 自動的にデータを5分間隔で更新
-- 🔧 初回起動時にAPI認証情報を簡単設定
+<p align="center">
+  <img src="https://img.shields.io/badge/platform-macOS-lightgrey.svg" alt="Platform">
+  <img src="https://img.shields.io/badge/electron-v36.4.0-blue.svg" alt="Electron">
+  <img src="https://img.shields.io/github/license/MASAKASUNO1/switchbot-monitor.svg" alt="License">
+</p>
 
-## 使用方法
+Monitor your SwitchBot devices directly from your macOS menubar with real-time temperature and humidity display.
 
-### 1. 依存関係のインストール
+## ✨ Features
+
+- 🌡️ **Real-time Display** - Temperature and humidity in menubar
+- 📱 **Device Management** - View all your SwitchBot devices
+- 🔄 **Auto Refresh** - Updates every 5 minutes automatically  
+- 🚀 **Launch at Login** - Start automatically with macOS
+- 🔧 **Easy Setup** - Simple API credential configuration
+- 🎯 **Multi-Device Support** - Select from multiple temperature sensors
+
+## 📥 Download
+
+Download the latest version from the [Releases](https://github.com/MASAKASUNO1/switchbot-monitor/releases) page:
+
+- **macOS Intel**: `SwitchBot Monitor-1.0.0.dmg` 
+- **macOS Apple Silicon**: `SwitchBot Monitor-1.0.0.dmg` (Universal build)
+
+## 🚀 Quick Start
+
+### Option 1: Download Pre-built App
+1. Download the DMG file from releases
+2. Install the app to Applications folder
+3. Launch SwitchBot Monitor
+4. Enter your SwitchBot API credentials
+
+### Option 2: Build from Source
+
 ```bash
+# Clone the repository
+git clone https://github.com/MASAKASUNO1/switchbot-monitor.git
+cd switchbot-monitor
+
+# Install dependencies
 npm install
-```
 
-### 2. アプリの起動
-```bash
+# Run the app
 npm start
+
+# Build for distribution
+npm run build
 ```
 
-### 3. API認証情報の設定
-初回起動時に設定画面が表示されます。
+## 🔐 API Setup
 
-**SwitchBotアプリでAPIトークンを取得する方法：**
-1. SwitchBotアプリを開く
-2. 右下の「Profile」をタップ
-3. 「設定」をタップ
-4. 「アプリバージョン」を10回タップ
-5. 「開発者向けオプション」が表示される
-6. 「トークンを取得」をタップ
+To use this app, you need SwitchBot API credentials:
 
-### 4. 使用開始
-- メニューバーに温度と湿度が表示されます（例：🌡️ 23.5°C 60% 💧）
-- 右クリックでデバイス一覧と詳細情報を確認できます
+1. Open SwitchBot mobile app
+2. Tap **Profile** (bottom right)
+3. Tap **Settings**
+4. Tap **App Version** 10 times
+5. **Developer Options** will appear
+6. Tap **Get Token**
 
-## 技術仕様
+Enter the **Token** and **Secret** in the setup window.
 
-- **Electron**: クロスプラットフォーム対応
-- **SwitchBot API v1.1**: HMAC-SHA256認証
-- **自動更新**: 5分間隔でデータ取得
-- **セキュア**: API認証情報は暗号化して保存
+## 🎯 Usage
 
-## ファイル構成
+- Temperature and humidity appear in menubar: `🌡️ 23.5°C 60% 💧`
+- Right-click to view all devices and settings
+- Select specific temperature device if you have multiple
+- Enable "Launch at Login" to start automatically
+
+## 🛠 Technology Stack
+
+- **Electron** - Cross-platform desktop app framework
+- **SwitchBot API v1.1** - Official API with HMAC-SHA256 authentication
+- **Node.js** - JavaScript runtime
+- **Axios** - HTTP client for API requests
+
+## 📁 Project Structure
 
 ```
 switchbot-monitor/
-├── main.js              # メインプロセス
+├── main.js              # Main process (menubar app)
 ├── src/
-│   ├── switchbot-api.js  # SwitchBot API ラッパー
-│   └── setup.html        # 認証設定画面
+│   ├── switchbot-api.js  # SwitchBot API wrapper
+│   └── setup.html        # API credentials setup UI
 ├── assets/
-│   └── icon.png          # メニューバーアイコン
-└── package.json
+│   └── icon.png          # Menubar icon
+└── package.json          # Dependencies and build config
 ```
 
-## 開発コマンド
+## 🤝 Contributing
 
-- `npm start` - アプリ起動
-- `npm run dev` - 開発モード起動
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-アプリが正常に起動し、メニューバーに表示されます！
+## 📄 License
+
+ISC License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [SwitchBot](https://www.switchbot.jp/) for providing the API
+- [Electron](https://www.electronjs.org/) for the desktop app framework
+
+---
+
+<p align="center">
+  Made with ❤️ for SwitchBot users
+</p>
