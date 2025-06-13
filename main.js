@@ -9,6 +9,8 @@ class SwitchBotMonitor {
     this.devices = [];
     this.deviceStatuses = {};
     this.updateInterval = null;
+    this.selectedDeviceId = null;
+    this.temperatureDevices = [];
   }
 
   createTray() {
@@ -30,7 +32,7 @@ class SwitchBotMonitor {
   }
 
   buildContextMenu() {
-    const contextMenu = Menu.buildFromTemplate([
+    const menuItems = [
       {
         label: 'SwitchBot Monitor',
         enabled: false
@@ -45,17 +47,37 @@ class SwitchBotMonitor {
             this.showSetupWindow();
           }
         }
-      },
-      ...this.buildDeviceMenuItems(),
-      { type: 'separator' },
-      {
-        label: 'Quit',
-        click: () => {
-          app.quit();
-        }
       }
-    ]);
+    ];
 
+    // Add temperature device selection submenu if there are multiple temperature devices
+    if (this.temperatureDevices.length > 1) {
+      menuItems.push({
+        label: 'Select Temperature Device',
+        submenu: this.temperatureDevices.map(device => ({
+          label: device.deviceName + (this.selectedDeviceId === device.deviceId ? ' ✓' : ''),
+          type: 'radio',
+          checked: this.selectedDeviceId === device.deviceId,
+          click: () => {
+            this.selectedDeviceId = device.deviceId;
+            this.saveSelectedDevice();
+            this.updateDisplay();
+            this.buildContextMenu();
+          }
+        }))
+      });
+    }
+
+    menuItems.push(...this.buildDeviceMenuItems());
+    menuItems.push({ type: 'separator' });
+    menuItems.push({
+      label: 'Quit',
+      click: () => {
+        app.quit();
+      }
+    });
+
+    const contextMenu = Menu.buildFromTemplate(menuItems);
     this.tray.setContextMenu(contextMenu);
   }
 
@@ -101,6 +123,22 @@ class SwitchBotMonitor {
       const devices = await this.api.getDevices();
       this.devices = devices;
 
+      // Filter temperature devices (devices that can provide temperature data)
+      this.temperatureDevices = devices.filter(device => 
+        device.deviceType === 'Meter' || 
+        device.deviceType === 'MeterPlus' || 
+        device.deviceType === 'Hub Mini' ||
+        device.deviceType === 'Indoor Cam' ||
+        device.deviceType.toLowerCase().includes('meter') ||
+        device.deviceType.toLowerCase().includes('thermo')
+      );
+
+      // Auto-select first temperature device if none selected
+      if (this.temperatureDevices.length > 0 && !this.selectedDeviceId) {
+        this.selectedDeviceId = this.temperatureDevices[0].deviceId;
+        this.saveSelectedDevice();
+      }
+
       for (const device of this.devices) {
         try {
           const status = await this.api.getDeviceStatus(device.deviceId);
@@ -121,12 +159,25 @@ class SwitchBotMonitor {
     let tempText = '--°C';
     let humidityText = '--%';
 
-    for (const status of Object.values(this.deviceStatuses)) {
+    // Use selected device if available, otherwise use any device with temperature data
+    if (this.selectedDeviceId && this.deviceStatuses[this.selectedDeviceId]) {
+      const status = this.deviceStatuses[this.selectedDeviceId];
       if (status.temperature !== undefined) {
         tempText = `${status.temperature}°C`;
       }
       if (status.humidity !== undefined) {
         humidityText = `${status.humidity}%`;
+      }
+    } else {
+      // Fallback to any device with temperature data
+      for (const status of Object.values(this.deviceStatuses)) {
+        if (status.temperature !== undefined) {
+          tempText = `${status.temperature}°C`;
+        }
+        if (status.humidity !== undefined) {
+          humidityText = `${status.humidity}%`;
+        }
+        break;
       }
     }
 
@@ -169,6 +220,7 @@ class SwitchBotMonitor {
     const { ipcMain } = require('electron');
     ipcMain.once('save-credentials', (event, credentials) => {
       this.api = new SwitchBotAPI(credentials.token, credentials.secret);
+      this.loadSelectedDevice();
       setupWindow.close();
       this.startPeriodicRefresh();
       this.refreshData();
@@ -185,9 +237,40 @@ class SwitchBotMonitor {
     }, 5 * 60 * 1000); // 5 minutes
   }
 
+  saveSelectedDevice() {
+    const fs = require('fs');
+    const configPath = path.join(__dirname, '.config.json');
+    
+    try {
+      let config = {};
+      if (fs.existsSync(configPath)) {
+        config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      }
+      config.selectedDeviceId = this.selectedDeviceId;
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+    } catch (error) {
+      console.error('Error saving selected device:', error);
+    }
+  }
+
+  loadSelectedDevice() {
+    const fs = require('fs');
+    const configPath = path.join(__dirname, '.config.json');
+    
+    try {
+      if (fs.existsSync(configPath)) {
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        this.selectedDeviceId = config.selectedDeviceId;
+      }
+    } catch (error) {
+      console.error('Error loading selected device:', error);
+    }
+  }
+
   init() {
     app.whenReady().then(() => {
       this.createTray();
+      this.loadSelectedDevice();
       
       app.on('window-all-closed', (e) => {
         e.preventDefault();
