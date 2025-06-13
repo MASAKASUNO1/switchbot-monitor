@@ -47,6 +47,16 @@ class SwitchBotMonitor {
             this.showSetupWindow();
           }
         }
+      },
+      {
+        label: 'Launch at Login',
+        type: 'checkbox',
+        checked: app.getLoginItemSettings().openAtLogin,
+        click: (menuItem) => {
+          app.setLoginItemSettings({
+            openAtLogin: menuItem.checked
+          });
+        }
       }
     ];
 
