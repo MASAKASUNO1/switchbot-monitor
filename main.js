@@ -1,5 +1,6 @@
 const { app, BrowserWindow, Tray, Menu, nativeImage } = require('electron');
 const path = require('path');
+const Store = require('electron-store');
 const SwitchBotAPI = require('./src/switchbot-api');
 
 class SwitchBotMonitor {
@@ -11,6 +12,10 @@ class SwitchBotMonitor {
     this.updateInterval = null;
     this.selectedDeviceId = null;
     this.temperatureDevices = [];
+    this.store = new Store({
+      encryptionKey: 'switchbot-monitor-encryption-key',
+      name: 'switchbot-config'
+    });
   }
 
   createTray() {
@@ -229,6 +234,9 @@ class SwitchBotMonitor {
 
     const { ipcMain } = require('electron');
     ipcMain.once('save-credentials', (event, credentials) => {
+      // Save credentials to encrypted store
+      this.saveCredentials(credentials.token, credentials.secret);
+      
       this.api = new SwitchBotAPI(credentials.token, credentials.secret);
       this.loadSelectedDevice();
       setupWindow.close();
@@ -277,10 +285,34 @@ class SwitchBotMonitor {
     }
   }
 
+  loadCredentials() {
+    const token = this.store.get('apiToken');
+    const secret = this.store.get('apiSecret');
+    
+    if (token && secret) {
+      this.api = new SwitchBotAPI(token, secret);
+      this.startPeriodicRefresh();
+      this.refreshData();
+      return true;
+    }
+    return false;
+  }
+
+  saveCredentials(token, secret) {
+    this.store.set('apiToken', token);
+    this.store.set('apiSecret', secret);
+  }
+
   init() {
     app.whenReady().then(() => {
       this.createTray();
       this.loadSelectedDevice();
+      
+      // Try to load saved credentials
+      if (!this.loadCredentials()) {
+        // If no credentials saved, show setup window
+        this.showSetupWindow();
+      }
       
       app.on('window-all-closed', (e) => {
         e.preventDefault();
